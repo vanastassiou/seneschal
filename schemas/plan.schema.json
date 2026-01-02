@@ -1,0 +1,56 @@
+{
+  "$id": "plan.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Base Plan Schema",
+  "description": "Abstract base schema for all plan types (recipes, programs, procedures)",
+  "type": "object",
+  "required": ["id", "domain", "name", "version", "createdAt"],
+  "properties": {
+    "id": {
+      "$ref": "common-definitions.schema.json#/definitions/uuid",
+      "description": "Unique plan identifier"
+    },
+    "domain": {
+      "type": "string",
+      "enum": ["gardener", "scribe", "soapmaker", "trainer"],
+      "description": "Domain this plan belongs to"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable plan name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the plan"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Plan version number (increments on edit)"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "archived"],
+      "default": "draft",
+      "description": "Plan lifecycle status"
+    },
+    "tags": {
+      "$ref": "common-definitions.schema.json#/definitions/tags"
+    },
+    "attachments": {
+      "$ref": "common-definitions.schema.json#/definitions/attachments"
+    },
+    "notes": {
+      "$ref": "common-definitions.schema.json#/definitions/notes"
+    },
+    "createdAt": {
+      "$ref": "common-definitions.schema.json#/definitions/timestamp"
+    },
+    "updatedAt": {
+      "$ref": "common-definitions.schema.json#/definitions/timestamp"
+    }
+  },
+  "additionalProperties": true
+}

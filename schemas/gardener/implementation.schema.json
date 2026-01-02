@@ -1,0 +1,155 @@
+{
+  "$id": "gardener/implementation.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Garden Log",
+  "description": "An execution record of garden activities",
+  "allOf": [
+    {
+      "$ref": "../implementation.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "const": "gardener"
+        },
+        "date": {
+          "$ref": "../common-definitions.schema.json#/definitions/date",
+          "description": "Log entry date"
+        },
+        "activities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "sowing",
+                  "transplanting",
+                  "watering",
+                  "weeding",
+                  "fertilizing",
+                  "pruning",
+                  "harvesting",
+                  "pest-control",
+                  "other"
+                ]
+              },
+              "bedId": {
+                "type": "string"
+              },
+              "plantId": {
+                "type": "string"
+              },
+              "notes": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "observations": {
+          "type": "object",
+          "properties": {
+            "weather": {
+              "type": "object",
+              "properties": {
+                "temperature": {
+                  "type": "number",
+                  "description": "Temperature in Celsius"
+                },
+                "conditions": {
+                  "type": "string",
+                  "enum": ["sunny", "cloudy", "overcast", "rainy", "stormy"]
+                },
+                "precipitation": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Precipitation in mm"
+                }
+              },
+              "additionalProperties": false
+            },
+            "pests": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"]
+                  },
+                  "plantId": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "growth": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "plantId": {
+                    "type": "string"
+                  },
+                  "stage": {
+                    "type": "string",
+                    "enum": [
+                      "germination",
+                      "seedling",
+                      "vegetative",
+                      "flowering",
+                      "fruiting",
+                      "mature",
+                      "dormant"
+                    ]
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "harvest": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["plantId", "quantity"],
+            "properties": {
+              "plantId": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unit": {
+                "type": "string",
+                "enum": ["count", "g", "kg", "lb", "oz", "bunch"]
+              },
+              "notes": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

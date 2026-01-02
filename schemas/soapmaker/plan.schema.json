@@ -1,0 +1,163 @@
+{
+  "$id": "soapmaker/plan.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Soap Recipe",
+  "description": "A soap recipe plan with oils, lye, and additives",
+  "allOf": [
+    {
+      "$ref": "../plan.schema.json"
+    },
+    {
+      "type": "object",
+      "required": ["oils", "lyeConcentration", "waterRatio"],
+      "properties": {
+        "domain": {
+          "const": "soapmaker"
+        },
+        "process": {
+          "type": "string",
+          "enum": ["cold-process", "hot-process", "melt-and-pour", "rebatch"],
+          "description": "Soapmaking process method"
+        },
+        "batchSize": {
+          "type": "object",
+          "required": ["value", "unit"],
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0
+            },
+            "unit": {
+              "type": "string",
+              "enum": ["g", "oz", "lb", "kg"]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Total oil weight for batch"
+        },
+        "oils": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["fatId", "percentage"],
+            "properties": {
+              "fatId": {
+                "type": "string",
+                "description": "Reference to fat in fats.json"
+              },
+              "percentage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Oil blend (percentages should sum to 100)"
+        },
+        "lyeConcentration": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 50,
+          "description": "Lye concentration percentage"
+        },
+        "waterRatio": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Water:lye ratio"
+        },
+        "superfat": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 30,
+          "default": 5,
+          "description": "Superfat percentage"
+        },
+        "additives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "id", "amount"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["fragrance", "colourant", "exfoliant", "other"]
+              },
+              "id": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string",
+                "enum": ["g", "ml", "tsp", "tbsp", "%"]
+              },
+              "addAt": {
+                "type": "string",
+                "enum": ["oils", "lye-water", "trace", "gel"]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "cureTime": {
+          "type": "object",
+          "properties": {
+            "minimum": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Minimum cure days"
+            },
+            "recommended": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Recommended cure days"
+            }
+          },
+          "additionalProperties": false
+        },
+        "expectedProperties": {
+          "type": "object",
+          "properties": {
+            "hardness": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "cleansing": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "conditioning": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "bubbly": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "creamy": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "longevity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false,
+          "description": "Calculated soap properties"
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

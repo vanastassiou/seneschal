@@ -1,0 +1,83 @@
+{
+  "$id": "scribe/implementation.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Idea Engagement",
+  "description": "A record of engaging with an idea - working on a project or consuming media",
+  "allOf": [
+    {
+      "$ref": "../implementation.schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "domain": {
+          "const": "scribe"
+        },
+        "ideaType": {
+          "type": "string",
+          "enum": ["project", "media"],
+          "description": "Type of idea engaged with"
+        },
+        "project": {
+          "type": "object",
+          "description": "Project engagement fields",
+          "properties": {
+            "hoursSpent": {
+              "type": "number",
+              "minimum": 0
+            },
+            "milestones": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "completedAt": {
+                    "$ref": "../common-definitions.schema.json#/definitions/timestamp"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "media": {
+          "type": "object",
+          "description": "Media consumption fields",
+          "properties": {
+            "progress": {
+              "type": "object",
+              "properties": {
+                "current": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Current position (page, episode, minute)"
+                },
+                "total": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Total length"
+                },
+                "unit": {
+                  "type": "string",
+                  "enum": ["page", "chapter", "episode", "minute", "percent"]
+                }
+              },
+              "additionalProperties": false
+            },
+            "rating": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "$id": "implementation.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Base Implementation Schema",
+  "description": "Abstract base schema for all implementation types (batches, sessions, logs)",
+  "type": "object",
+  "required": ["id", "domain", "planSnapshot", "startedAt", "status"],
+  "properties": {
+    "id": {
+      "$ref": "common-definitions.schema.json#/definitions/uuid",
+      "description": "Unique implementation identifier"
+    },
+    "domain": {
+      "type": "string",
+      "enum": ["gardener", "scribe", "soapmaker", "trainer"],
+      "description": "Domain this implementation belongs to"
+    },
+    "planId": {
+      "$ref": "common-definitions.schema.json#/definitions/uuid",
+      "description": "Reference to current plan (may have been updated since execution)"
+    },
+    "planSnapshot": {
+      "type": "object",
+      "description": "Immutable copy of plan at execution time",
+      "required": ["id", "name", "version"],
+      "properties": {
+        "id": {
+          "$ref": "common-definitions.schema.json#/definitions/uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planned", "in-progress", "completed", "abandoned"],
+      "default": "planned",
+      "description": "Execution status"
+    },
+    "startedAt": {
+      "$ref": "common-definitions.schema.json#/definitions/timestamp",
+      "description": "When execution started"
+    },
+    "completedAt": {
+      "$ref": "common-definitions.schema.json#/definitions/timestamp",
+      "description": "When execution completed (null if ongoing/abandoned)"
+    },
+    "deviations": {
+      "type": "array",
+      "items": {
+        "$ref": "common-definitions.schema.json#/definitions/deviation"
+      },
+      "description": "Documented deviations from plan"
+    },
+    "outcome": {
+      "$ref": "common-definitions.schema.json#/definitions/outcome"
+    },
+    "tags": {
+      "$ref": "common-definitions.schema.json#/definitions/tags"
+    },
+    "attachments": {
+      "$ref": "common-definitions.schema.json#/definitions/attachments"
+    },
+    "notes": {
+      "$ref": "common-definitions.schema.json#/definitions/notes"
+    },
+    "createdAt": {
+      "$ref": "common-definitions.schema.json#/definitions/timestamp"
+    },
+    "updatedAt": {
+      "$ref": "common-definitions.schema.json#/definitions/timestamp"
+    }
+  },
+  "additionalProperties": true
+}

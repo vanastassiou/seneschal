@@ -1,0 +1,100 @@
+{
+  "$id": "trainer/implementation.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Training Session",
+  "description": "An execution record of a workout session",
+  "allOf": [
+    {
+      "$ref": "../implementation.schema.json"
+    },
+    {
+      "type": "object",
+      "required": ["dayIndex", "exercises"],
+      "properties": {
+        "domain": {
+          "const": "trainer"
+        },
+        "dayIndex": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index of day in program (0-based)"
+        },
+        "cycleNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Which cycle through the program"
+        },
+        "bodyweight": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Bodyweight at session (kg)"
+        },
+        "preSessionFeeling": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Energy/readiness before session"
+        },
+        "exercises": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["exerciseId", "sets"],
+            "properties": {
+              "exerciseId": {
+                "type": "string",
+                "pattern": "^[a-z0-9-]+$"
+              },
+              "sets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "reps": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "weight": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "rir": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 5
+                    },
+                    "notes": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "skipped": {
+                "type": "boolean",
+                "default": false
+              },
+              "substitutedWith": {
+                "type": "string",
+                "description": "exerciseId if substituted"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "duration": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Actual session duration in minutes"
+        },
+        "postSessionFeeling": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "How the session felt"
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

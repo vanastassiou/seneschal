@@ -1,0 +1,110 @@
+{
+  "$id": "common-definitions.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Common Schema Definitions",
+  "description": "Shared definitions for personal knowledge app schemas",
+  "definitions": {
+    "uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+      "description": "UUID v4 identifier"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Date in YYYY-MM-DD format"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[a-z0-9-]+$"
+      },
+      "uniqueItems": true,
+      "description": "Kebab-case tags for categorization"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/attachment"
+      },
+      "description": "File attachments"
+    },
+    "attachment": {
+      "type": "object",
+      "required": ["id", "filename", "mimeType"],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/uuid"
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mimeType": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "additionalProperties": false
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-form notes"
+    },
+    "outcome": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Whether the implementation was successful"
+        },
+        "rating": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Overall rating 1-5"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Brief summary of the outcome"
+        }
+      },
+      "additionalProperties": false
+    },
+    "deviation": {
+      "type": "object",
+      "required": ["field", "planned", "actual"],
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "Path to field that deviated"
+        },
+        "planned": {
+          "description": "Original planned value"
+        },
+        "actual": {
+          "description": "Actual value used"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Why the deviation occurred"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

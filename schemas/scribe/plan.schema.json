@@ -1,0 +1,83 @@
+{
+  "$id": "scribe/plan.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Idea",
+  "description": "A captured idea - project, media recommendation, or note",
+  "allOf": [
+    {
+      "$ref": "../plan.schema.json"
+    },
+    {
+      "type": "object",
+      "required": ["ideaType"],
+      "properties": {
+        "domain": {
+          "const": "scribe"
+        },
+        "ideaType": {
+          "type": "string",
+          "enum": ["project", "media", "note"],
+          "description": "Type of idea captured"
+        },
+        "project": {
+          "type": "object",
+          "description": "Project-specific fields (when ideaType=project)",
+          "properties": {
+            "interest": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5,
+              "description": "Interest level 1-5"
+            },
+            "effort": {
+              "type": "string",
+              "enum": ["trivial", "small", "medium", "large", "epic"]
+            },
+            "resources": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uri"
+              },
+              "description": "Reference URLs"
+            },
+            "collaborators": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "deadline": {
+              "$ref": "../common-definitions.schema.json#/definitions/date"
+            }
+          },
+          "additionalProperties": false
+        },
+        "media": {
+          "type": "object",
+          "description": "Media-specific fields (when ideaType=media)",
+          "properties": {
+            "mediaType": {
+              "type": "string",
+              "enum": ["book", "article", "video", "podcast", "movie", "tv-show", "game", "other"]
+            },
+            "recommender": {
+              "type": "string",
+              "description": "Who recommended this"
+            },
+            "reason": {
+              "type": "string",
+              "description": "Why it was recommended"
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

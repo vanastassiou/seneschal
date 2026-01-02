@@ -1,0 +1,118 @@
+{
+  "$id": "soapmaker/implementation.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Soap Batch",
+  "description": "An execution record of making a soap batch",
+  "allOf": [
+    {
+      "$ref": "../implementation.schema.json"
+    },
+    {
+      "type": "object",
+      "required": ["batchNumber"],
+      "properties": {
+        "domain": {
+          "const": "soapmaker"
+        },
+        "batchNumber": {
+          "type": "string",
+          "pattern": "^[A-Z0-9-]+$",
+          "description": "Unique batch identifier (e.g., 2024-001)"
+        },
+        "environment": {
+          "type": "object",
+          "properties": {
+            "temperature": {
+              "type": "number",
+              "description": "Room temperature in Celsius"
+            },
+            "humidity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false
+        },
+        "temperatures": {
+          "type": "object",
+          "properties": {
+            "oils": {
+              "type": "number",
+              "description": "Oil temperature at mix (Celsius)"
+            },
+            "lye": {
+              "type": "number",
+              "description": "Lye solution temperature at mix (Celsius)"
+            }
+          },
+          "additionalProperties": false
+        },
+        "timeline": {
+          "type": "object",
+          "properties": {
+            "mixedAt": {
+              "$ref": "../common-definitions.schema.json#/definitions/timestamp"
+            },
+            "tracedAt": {
+              "$ref": "../common-definitions.schema.json#/definitions/timestamp"
+            },
+            "moldedAt": {
+              "$ref": "../common-definitions.schema.json#/definitions/timestamp"
+            },
+            "unmoldedAt": {
+              "$ref": "../common-definitions.schema.json#/definitions/timestamp"
+            },
+            "cutAt": {
+              "$ref": "../common-definitions.schema.json#/definitions/timestamp"
+            },
+            "curedAt": {
+              "$ref": "../common-definitions.schema.json#/definitions/timestamp"
+            }
+          },
+          "additionalProperties": false
+        },
+        "yield": {
+          "type": "object",
+          "properties": {
+            "bars": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "totalWeight": {
+              "type": "number",
+              "minimum": 0
+            },
+            "unit": {
+              "type": "string",
+              "enum": ["g", "oz"]
+            }
+          },
+          "additionalProperties": false
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["timestamp", "note"],
+            "properties": {
+              "timestamp": {
+                "$ref": "../common-definitions.schema.json#/definitions/timestamp"
+              },
+              "phase": {
+                "type": "string",
+                "enum": ["mixing", "trace", "molding", "gel", "unmolding", "curing"]
+              },
+              "note": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Timestamped observations during batch"
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

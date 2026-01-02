@@ -1,0 +1,107 @@
+{
+  "$id": "gardener/plan.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Planting Plan",
+  "description": "A garden planting plan with beds and timing",
+  "allOf": [
+    {
+      "$ref": "../plan.schema.json"
+    },
+    {
+      "type": "object",
+      "required": ["beds"],
+      "properties": {
+        "domain": {
+          "const": "gardener"
+        },
+        "season": {
+          "type": "string",
+          "enum": ["spring", "summer", "fall", "winter"],
+          "description": "Target growing season"
+        },
+        "year": {
+          "type": "integer",
+          "minimum": 2000,
+          "description": "Planning year"
+        },
+        "beds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["bedId", "plants"],
+            "properties": {
+              "bedId": {
+                "type": "string",
+                "description": "Reference to bed in garden layout"
+              },
+              "plants": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["plantId", "quantity"],
+                  "properties": {
+                    "plantId": {
+                      "type": "string",
+                      "description": "Reference to plant in plants.json"
+                    },
+                    "quantity": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "spacing": {
+                      "type": "object",
+                      "properties": {
+                        "inRow": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Spacing in row (cm)"
+                        },
+                        "betweenRows": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Spacing between rows (cm)"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "notes": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "startMethod": {
+          "type": "string",
+          "enum": ["direct-sow", "transplant", "stratify", "direct-or-transplant"],
+          "description": "How seeds will be started"
+        },
+        "timing": {
+          "type": "object",
+          "properties": {
+            "startIndoors": {
+              "type": "integer",
+              "description": "Weeks before last frost to start indoors"
+            },
+            "transplant": {
+              "type": "integer",
+              "description": "Weeks after last frost to transplant"
+            },
+            "directSow": {
+              "type": "integer",
+              "description": "Weeks relative to last frost for direct sowing"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Frost-relative timing"
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

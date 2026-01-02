@@ -1,0 +1,127 @@
+{
+  "$id": "trainer/plan.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Training Program",
+  "description": "A structured workout program with training days",
+  "allOf": [
+    {
+      "$ref": "../plan.schema.json"
+    },
+    {
+      "type": "object",
+      "required": ["days"],
+      "properties": {
+        "domain": {
+          "const": "trainer"
+        },
+        "goal": {
+          "type": "string",
+          "enum": ["strength", "hypertrophy", "endurance", "mobility", "general-fitness"],
+          "description": "Primary training goal"
+        },
+        "frequency": {
+          "type": "object",
+          "properties": {
+            "daysPerWeek": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7
+            },
+            "cycleLength": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Days in full cycle"
+            }
+          },
+          "additionalProperties": false
+        },
+        "days": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["exercises"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Day label (e.g., Push, Leg Day)"
+              },
+              "focus": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "chest",
+                    "back",
+                    "shoulders",
+                    "biceps",
+                    "triceps",
+                    "quadriceps",
+                    "hamstrings",
+                    "glutes",
+                    "calves",
+                    "core"
+                  ]
+                }
+              },
+              "exercises": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["exerciseId"],
+                  "properties": {
+                    "exerciseId": {
+                      "type": "string",
+                      "pattern": "^[a-z0-9-]+$"
+                    },
+                    "sets": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "reps": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^\\d+-\\d+$"
+                        }
+                      ],
+                      "description": "Rep count or range (e.g., 8 or '8-12')"
+                    },
+                    "rir": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 5,
+                      "description": "Target reps in reserve"
+                    },
+                    "rest": {
+                      "type": "integer",
+                      "description": "Rest period in seconds"
+                    },
+                    "notes": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "estimatedDuration": {
+                "type": "integer",
+                "description": "Estimated minutes"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "progressionScheme": {
+          "type": "string",
+          "description": "How to progress (e.g., linear, double progression, wave loading)"
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}
