@@ -1,0 +1,23 @@
+{
+  "name": "seneschal-core",
+  "version": "1.0.0",
+  "description": "Shared sync engine and schemas for seneschal projects",
+  "type": "module",
+  "main": "js/index.js",
+  "exports": {
+    ".": "./js/index.js",
+    "./sync": "./js/sync/index.js",
+    "./providers": "./js/providers/index.js",
+    "./oauth": "./js/oauth/index.js"
+  },
+  "files": [
+    "js",
+    "schemas"
+  ],
+  "keywords": [
+    "sync",
+    "google-drive",
+    "offline-first"
+  ],
+  "license": "MIT"
+}
