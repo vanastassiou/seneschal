@@ -178,3 +178,44 @@ export async function createFolder(name, parentId = null) {
     name: result.name
   };
 }
+
+/**
+ * Find a folder by name in the root of Google Drive, or create it
+ * @param {string} name - Folder name to find or create
+ * @returns {Promise<{id: string, name: string}>} Found or created folder
+ */
+export async function findOrCreateFolderByName(name) {
+  const token = getToken('google');
+  if (!token) {
+    throw new Error('Not authenticated with Google');
+  }
+
+  // Search for existing folder by name in root
+  const query = `name='${name}' and mimeType='application/vnd.google-apps.folder' and 'root' in parents and trashed=false`;
+  const searchResponse = await fetch(
+    `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)`,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!searchResponse.ok) {
+    const error = await searchResponse.json().catch(() => ({}));
+    throw new Error(error.error?.message || 'Failed to search for folder');
+  }
+
+  const searchResult = await searchResponse.json();
+
+  // If folder exists, return it
+  if (searchResult.files && searchResult.files.length > 0) {
+    return {
+      id: searchResult.files[0].id,
+      name: searchResult.files[0].name
+    };
+  }
+
+  // Otherwise create it
+  return createFolder(name);
+}

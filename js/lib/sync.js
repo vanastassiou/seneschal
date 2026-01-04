@@ -19,6 +19,7 @@ export function initSync(config) {
   provider = createGoogleDriveProvider({
     domain: DOMAIN,
     clientId: config.google.clientId,
+    clientSecret: config.google.clientSecret,
     apiKey: config.google.apiKey,
     redirectUri: config.redirectUri
   });
@@ -95,6 +96,17 @@ export async function selectFolder() {
     throw new Error('Sync not initialized. Call initSync first.');
   }
   return provider.selectFolder();
+}
+
+/**
+ * Set sync folder by name (finds existing or creates new)
+ * @param {string} folderName - Name of folder to use
+ */
+export async function setFolderByName(folderName) {
+  if (!provider) {
+    throw new Error('Sync not initialized. Call initSync first.');
+  }
+  return provider.setFolderByName(folderName);
 }
 
 /**
@@ -181,6 +193,7 @@ export default {
   isConnected,
   isFolderConfigured,
   selectFolder,
+  setFolderByName,
   getFolder,
   sync,
   canSync,

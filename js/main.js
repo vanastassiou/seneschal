@@ -14,6 +14,7 @@ import { showToast } from './ui/components/toast.js';
 let ideas = [];
 let currentPanel = 'dashboard';
 let editingIdeaId = null;
+let syncInitialized = false;
 
 // =============================================================================
 // DOM Elements
@@ -34,6 +35,7 @@ async function init() {
   try {
     const configModule = await import('./lib/config.js');
     sync.initSync(configModule.config);
+    syncInitialized = true;
 
     // Handle OAuth callback
     if (sync.checkOAuthCallback()) {
@@ -44,11 +46,12 @@ async function init() {
         showToast('Connection failed: ' + e.message, 'error');
       }
     }
-
-    updateSyncUI();
   } catch (e) {
     console.log('Sync not configured (config.js missing)');
+    syncInitialized = false;
   }
+
+  updateSyncUI();
 
   // Set up event listeners
   setupNavigation();
@@ -536,8 +539,15 @@ function setupSettings() {
   // Connect button
   $('#connect-btn').addEventListener('click', handleConnect);
 
-  // Select folder button
-  $('#select-folder-btn').addEventListener('click', handleSelectFolder);
+  // Folder name input
+  $('#set-folder-btn').addEventListener('click', handleSetFolder);
+  $('#folder-name-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') handleSetFolder();
+  });
+  $('#change-folder-btn').addEventListener('click', () => {
+    $('#folder-display').classList.add('hidden');
+    $('#folder-input-group').classList.remove('hidden');
+  });
 
   // Sync now button
   $('#sync-now-btn').addEventListener('click', handleSyncNow);
@@ -549,37 +559,123 @@ function setupSettings() {
 }
 
 function updateSyncUI() {
-  const connected = sync.isConnected();
-  const folderConfigured = sync.isFolderConfigured();
-
   const statusBadge = $('#sync-status');
   const connectBtn = $('#connect-btn');
   const folderConfig = $('#folder-config');
   const syncActions = $('#sync-actions');
+  const folderPending = $('#folder-pending');
+  const syncPending = $('#sync-pending');
+  const connectHelp = $('#connect-help');
+
+  // Step elements
+  const stepConnect = $('#step-connect');
+  const stepFolder = $('#step-folder');
+  const stepSync = $('#step-sync');
+
+  // Check if sync is configured
+  if (!syncInitialized) {
+    statusBadge.textContent = 'Not configured';
+    statusBadge.classList.remove('connected');
+    connectBtn.textContent = 'Setup Required';
+    connectBtn.disabled = true;
+    connectHelp.textContent = 'OAuth credentials not configured.';
+    folderConfig.classList.add('hidden');
+    folderPending.classList.remove('hidden');
+    syncActions.classList.add('hidden');
+    syncPending.classList.remove('hidden');
+
+    // Reset step states
+    stepConnect.classList.remove('completed');
+    stepFolder.classList.remove('completed');
+    stepSync.classList.remove('completed');
+
+    // Show setup instructions
+    const syncSettings = $('#sync-settings');
+    if (!syncSettings.querySelector('.setup-instructions')) {
+      const instructions = document.createElement('div');
+      instructions.className = 'setup-instructions';
+      instructions.innerHTML = `
+        <p>To enable sync, create your config file:</p>
+        <ol>
+          <li>Copy <code>js/lib/config.example.js</code> to <code>js/lib/config.js</code></li>
+          <li>Add your Google OAuth credentials from the Google Cloud Console</li>
+          <li>Refresh this page</li>
+        </ol>
+      `;
+      syncSettings.appendChild(instructions);
+    }
+
+    updateSyncSummary();
+    return;
+  }
+
+  // Remove any setup instructions since we're configured
+  const existingInstructions = $('#sync-settings .setup-instructions');
+  if (existingInstructions) {
+    existingInstructions.remove();
+  }
+
+  connectBtn.disabled = false;
+  const connected = sync.isConnected();
+  const folderConfigured = sync.isFolderConfigured();
 
   if (connected) {
+    // Step 1: Connected
     statusBadge.textContent = 'Connected';
     statusBadge.classList.add('connected');
     connectBtn.textContent = 'Disconnect';
+    connectHelp.textContent = 'You are signed in with Google.';
+    stepConnect.classList.add('completed');
 
+    // Step 2: Folder
     folderConfig.classList.remove('hidden');
+    folderPending.classList.add('hidden');
 
     if (folderConfigured) {
+      // Folder configured
       const folder = sync.getFolder();
       $('#folder-name').textContent = folder?.name || 'seneschal-sync';
+      $('#folder-display').classList.remove('hidden');
+      $('#folder-input-group').classList.add('hidden');
+      stepFolder.classList.add('completed');
+
+      // Step 3: Sync ready
       syncActions.classList.remove('hidden');
+      syncPending.classList.add('hidden');
+      stepSync.classList.add('completed');
 
       const lastSync = sync.getLastSync();
       $('#last-sync').textContent = lastSync
         ? `Last sync: ${formatDate(lastSync)}`
         : '';
+    } else {
+      // Folder not configured yet
+      $('#folder-display').classList.add('hidden');
+      $('#folder-input-group').classList.remove('hidden');
+      stepFolder.classList.remove('completed');
+
+      // Step 3: Waiting for folder
+      syncActions.classList.add('hidden');
+      syncPending.classList.remove('hidden');
+      stepSync.classList.remove('completed');
     }
   } else {
+    // Not connected
     statusBadge.textContent = 'Not connected';
     statusBadge.classList.remove('connected');
     connectBtn.textContent = 'Connect';
+    connectHelp.textContent = 'Sign in with your Google account to enable sync.';
+    stepConnect.classList.remove('completed');
+
+    // Step 2: Waiting for connection
     folderConfig.classList.add('hidden');
+    folderPending.classList.remove('hidden');
+    stepFolder.classList.remove('completed');
+
+    // Step 3: Waiting for folder
     syncActions.classList.add('hidden');
+    syncPending.classList.remove('hidden');
+    stepSync.classList.remove('completed');
   }
 
   updateSyncSummary();
@@ -601,14 +697,26 @@ async function handleConnect() {
   updateDashboard();
 }
 
-async function handleSelectFolder() {
+async function handleSetFolder() {
+  const folderName = $('#folder-name-input').value.trim();
+  if (!folderName) {
+    showToast('Please enter a folder name', 'warning');
+    return;
+  }
+
   try {
-    await sync.selectFolder();
-    showToast('Folder selected', 'success');
+    $('#set-folder-btn').disabled = true;
+    $('#set-folder-btn').textContent = 'Setting up...';
+
+    await sync.setFolderByName(folderName);
+    showToast(`Folder "${folderName}" configured`, 'success');
     updateSyncUI();
     updateDashboard();
   } catch (e) {
-    showToast('Failed to select folder: ' + e.message, 'error');
+    showToast('Failed to set folder: ' + e.message, 'error');
+  } finally {
+    $('#set-folder-btn').disabled = false;
+    $('#set-folder-btn').textContent = 'Set Folder';
   }
 }
 

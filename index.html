@@ -68,19 +68,56 @@
             <section id="settings-panel" class="panel">
                 <div class="settings-section">
                     <h3>Cloud Sync</h3>
+                    <p id="sync-description" class="section-description">Sync your ideas to Google Drive to access them from any device.</p>
                     <div id="sync-settings" class="settings-group">
-                        <div class="sync-provider">
-                            <span class="provider-name">Google Drive</span>
-                            <span id="sync-status" class="status-badge">Not connected</span>
-                            <button id="connect-btn" class="btn btn-secondary">Connect</button>
+                        <div class="sync-step" id="step-connect">
+                            <div class="step-header">
+                                <span class="step-number">1</span>
+                                <span class="step-title">Connect to Google Drive</span>
+                            </div>
+                            <div class="step-content">
+                                <div class="sync-provider">
+                                    <span id="sync-status" class="status-badge">Not connected</span>
+                                    <button id="connect-btn" class="btn btn-secondary">Connect</button>
+                                </div>
+                                <p id="connect-help" class="help-text">Sign in with your Google account to enable sync.</p>
+                            </div>
                         </div>
-                        <div id="folder-config" class="folder-config hidden">
-                            <p>Folder: <span id="folder-name">Not selected</span></p>
-                            <button id="select-folder-btn" class="btn btn-secondary">Select Folder</button>
+
+                        <div class="sync-step" id="step-folder">
+                            <div class="step-header">
+                                <span class="step-number">2</span>
+                                <span class="step-title">Choose sync folder</span>
+                            </div>
+                            <div id="folder-config" class="step-content hidden">
+                                <div id="folder-display" class="hidden">
+                                    <p>Syncing to: <strong id="folder-name">Not selected</strong></p>
+                                    <button id="change-folder-btn" class="btn btn-secondary btn-sm">Change</button>
+                                </div>
+                                <div id="folder-input-group">
+                                    <p class="help-text">Enter a folder name. It will be created in your Google Drive if it doesn't exist.</p>
+                                    <div class="input-group">
+                                        <input type="text" id="folder-name-input" value="seneschal-sync" placeholder="e.g., seneschal-sync">
+                                        <button id="set-folder-btn" class="btn btn-primary">Set Folder</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <p id="folder-pending" class="help-text">Connect to Google Drive first.</p>
                         </div>
-                        <div id="sync-actions" class="sync-actions hidden">
-                            <button id="sync-now-btn" class="btn btn-primary">Sync Now</button>
-                            <span id="last-sync" class="last-sync"></span>
+
+                        <div class="sync-step" id="step-sync">
+                            <div class="step-header">
+                                <span class="step-number">3</span>
+                                <span class="step-title">Sync your data</span>
+                            </div>
+                            <div id="sync-actions" class="step-content hidden">
+                                <p class="help-text">Your ideas will be saved to Google Drive and synced across devices.</p>
+                                <div class="sync-controls">
+                                    <button id="sync-now-btn" class="btn btn-primary">Sync Now</button>
+                                    <span id="last-sync" class="last-sync"></span>
+                                </div>
+                            </div>
+                            <p id="sync-pending" class="help-text">Set up a sync folder first.</p>
                         </div>
                     </div>
                 </div>

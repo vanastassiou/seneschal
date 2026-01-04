@@ -4,7 +4,7 @@
  */
 
 import { getToken, startAuth, handleCallback, isAuthenticated, logout } from '../oauth/index.js';
-import { getSavedFolder, pickFolder, saveFolder, clearFolder } from './google-picker.js';
+import { getSavedFolder, pickFolder, saveFolder, clearFolder, findOrCreateFolderByName } from './google-picker.js';
 
 const SCOPES = [
   'https://www.googleapis.com/auth/drive.file'
@@ -78,6 +78,19 @@ export function createGoogleDriveProvider(config) {
       fileId = null;
       attachmentsFolderId = null;
     }
+    return folder;
+  }
+
+  /**
+   * Set folder by name (finds existing or creates new)
+   * @param {string} folderName - Name of folder to use
+   */
+  async function setFolderByName(folderName) {
+    const folder = await findOrCreateFolderByName(folderName);
+    saveFolder(domain, folder);
+    // Reset cached IDs when folder changes
+    fileId = null;
+    attachmentsFolderId = null;
     return folder;
   }
 
@@ -419,6 +432,7 @@ export function createGoogleDriveProvider(config) {
     handleAuthCallback,
     disconnect,
     selectFolder,
+    setFolderByName,
     getFolder,
     removeFolder,
     fetch,
